@@ -4,7 +4,7 @@
 
 TalentScout is an AI-powered hiring assistant chatbot built for a technology recruitment agency. It conducts structured candidate screening interviews through a conversational interface, collecting personal and professional details one question at a time, then generating tailored technical interview questions based on the candidate's reported tech stack.
 
-The application is built with Python, Streamlit, and the OpenAI GPT-3.5-turbo model. It runs entirely in the browser as a single-page Streamlit application.
+The application is built with Python, Streamlit, and the Groq API (serving the Llama 3.3 70B model via an OpenAI-compatible interface). It runs entirely in the browser as a single-page Streamlit application.
 
 ### Key Features
 
@@ -22,7 +22,7 @@ The application is built with Python, Streamlit, and the OpenAI GPT-3.5-turbo mo
 
 - **Python 3.9+** - Core programming language
 - **Streamlit** - Web UI framework for the chat interface
-- **OpenAI GPT-3.5-turbo** - Large language model for conversation and question generation
+- **Groq API (Llama 3.3 70B)** - LLM inference via OpenAI-compatible endpoint
 - **python-dotenv** - Environment variable management for API key storage
 
 ## Installation and Setup
@@ -30,7 +30,7 @@ The application is built with Python, Streamlit, and the OpenAI GPT-3.5-turbo mo
 ### Prerequisites
 
 - Python 3.9 or higher installed on your system
-- An OpenAI API key (obtain one at https://platform.openai.com/api-keys)
+- A Groq API key (obtain one free at https://console.groq.com/keys)
 
 ### Step-by-step Setup
 
@@ -69,7 +69,7 @@ The application is built with Python, Streamlit, and the OpenAI GPT-3.5-turbo mo
 
    Open the `.env` file in the project root and replace the placeholder value:
    ```
-   OPENAI_API_KEY=sk-your-actual-api-key-here
+   GROQ_API_KEY=gsk-your-actual-api-key-here
    ```
 
 6. **Run the application**
@@ -114,7 +114,7 @@ When the candidate provides their tech stack, the system prompt instructs the mo
 
 ### Context Maintenance
 
-The full `st.session_state.messages` list is passed to the OpenAI API on every call. This means the model always has access to the complete conversation history, preventing it from re-asking questions or losing track of what has been collected. The system prompt is prepended as the first message in every request.
+The full `st.session_state.messages` list is passed to the Groq API on every call. This means the model always has access to the complete conversation history, preventing it from re-asking questions or losing track of what has been collected. The system prompt is prepended as the first message in every request.
 
 ## Project Structure
 
@@ -132,7 +132,7 @@ talentscout/
 
 ### File Responsibilities
 
-- **config.py** - Loads the `.env` file using python-dotenv and exposes `OPENAI_API_KEY`, `MODEL_NAME`, `MAX_TOKENS`, and `TEMPERATURE` as module-level constants.
+- **config.py** - Loads the `.env` file using python-dotenv and exposes `GROQ_API_KEY`, `GROQ_BASE_URL`, `MODEL_NAME`, `MAX_TOKENS`, and `TEMPERATURE` as module-level constants.
 - **prompts.py** - Contains five prompt templates: `SYSTEM_PROMPT`, `GREETING_PROMPT`, `QUESTION_GENERATION_PROMPT`, `FALLBACK_PROMPT`, and `FAREWELL_PROMPT`.
 - **utils.py** - Provides helper functions for session state initialization, exit keyword detection, email/phone validation, candidate info extraction from chat history, JSON file saving, and chat history formatting.
 - **app.py** - Orchestrates the entire application: page config, custom CSS injection, sidebar rendering, chat message display, user input handling, LLM calls, and conversation state management.
@@ -161,13 +161,13 @@ talentscout/
 
 **Challenge**: Candidate personal data (name, email, phone) must be handled responsibly.
 
-**Solution**: All data is stored locally in `candidates_data.json` and is never transmitted to any third-party service beyond the OpenAI API (which is necessary for the LLM inference). No data is logged to external servers or analytics platforms.
+**Solution**: All data is stored locally in `candidates_data.json` and is never transmitted to any third-party service beyond the Groq API (which is necessary for the LLM inference). No data is logged to external servers or analytics platforms.
 
 ## Data Privacy
 
 - All candidate data is stored locally in `candidates_data.json` on the machine running the application.
-- No data is sent to third-party services other than OpenAI for generating LLM responses.
-- The conversation content sent to OpenAI is subject to OpenAI's data usage policies.
+- No data is sent to third-party services other than Groq for generating LLM responses.
+- The conversation content sent to Groq is subject to Groq's data usage policies.
 - The application follows a data minimization approach: only the information required for screening is collected.
 - For production deployment, additional measures such as encryption at rest, access controls, and explicit user consent should be implemented.
 - The `.env` file containing the API key should never be committed to version control. Add it to `.gitignore`.
